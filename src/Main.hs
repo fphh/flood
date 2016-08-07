@@ -130,7 +130,7 @@ renderGame_ mat =
 renderHeader_ :: ReactElementM ViewEventHandler ()
 renderHeader_ = do
   h1_ [] "Flood"
-  p_ [] "Click on a color of your choice. This will fill the area starting in the left upper corner with the choosen color. How many clicks do you need until only one color is left?"
+  p_ [] "Click on a color of your choice. This will fill the area starting from the left upper corner with the choosen color. How many clicks do you need until only one color is left?"
 
   
 renderCounter_ :: Int -> Bool -> Maybe Int -> ReactElementM ViewEventHandler ()

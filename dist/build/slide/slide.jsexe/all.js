@@ -68644,7 +68644,7 @@ function h$mainZCMainzizdwrenderGamezu_e()
   h$mainZCMainzirenderMatrix1, h$ghczmprimZCGHCziTypesziZMZN, h$c1(h$$NR, a)));
   return h$stack[h$sp];
 };
-var h$mainZCMainzirenderMatrix17 = h$strta("Click on a color of your choice. This will fill the area starting in the left upper corner with the choosen color. How many clicks do you need until only one color is left?");
+var h$mainZCMainzirenderMatrix17 = h$strta("Click on a color of your choice. This will fill the area starting from the left upper corner with the choosen color. How many clicks do you need until only one color is left?");
 function h$mainZCMainzirenderMatrix8_e()
 {
   h$bh();
