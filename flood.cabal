@@ -25,7 +25,8 @@ executable flood
                        vector ==0.11.0.*,
                        random ==1.1,
                        aeson ==0.11.2.*,
-                       colour ==2.3.3
+                       colour ==2.3.3,
+                       primitive ==0.6.1.*
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghcjs-options: -O2 -Wall

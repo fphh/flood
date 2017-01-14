@@ -13,21 +13,16 @@ import Control.DeepSeq (NFData)
 
 import GHC.Generics (Generic)
 
-
 import qualified Data.Aeson as Aeson
 
 import Data.Colour (Colour)
 import qualified Data.Colour.Names as CN
 import qualified Data.Colour.SRGB as SRGB
 
-import React.Flux
-
 import qualified Data.Vector as Vec
-
 import Data.Vector (Vector)
 
-import qualified Data.Set as Set
-import qualified Data.List as List
+import React.Flux
 
 import Algorithm
 
@@ -38,7 +33,7 @@ toHex c = SRGB.sRGB24show $
    Red -> CN.firebrick
    Blue -> CN.dodgerblue
    Yellow -> CN.yellow
-   Pink -> CN.darkorange
+   DarkOrange -> CN.darkorange
 
 data AppState = AppState {
   matrix :: Maybe (Matrix Color, Int),
@@ -59,21 +54,13 @@ newBestScore xs bs =
    (Nothing, x) -> x
    (Just (_, x), Just y) -> Just (min x y)
 
-changeColors :: Monad m => Matrix Color -> Color -> Int -> Maybe Int -> m AppState
-changeColors mat color cnt bs = do
-  let oldColor = look mat center
-      sol = Set.toList $ solution (\x -> look mat x == oldColor) center
-      gs = map (\((a, y):zs) -> (a, (y, color):map (\x -> (snd x, color)) zs))
-           $ List.groupBy (\x y -> fst x == fst y)
-           $ List.sortBy (\x y -> compare (fst x) (fst y)) sol
-      newMat = List.foldl' f mat gs
-      f acc (r, is) =
-        let s = Vec.unsafeUpd (acc Vec.! r) is
-        in Vec.unsafeUpd acc [(r, s)]
+changeColors :: Matrix Color -> Color -> Int -> Maybe Int -> AppState
+changeColors mat newColor cnt bs = 
+  let newMat = floodFill mat newColor center
+      ec = endCondition newMat newColor
       res = Just (newMat, cnt+1)
-      ec = endCondition newMat color
       newBs = if ec then newBestScore res bs else bs
-  return $ AppState res (endCondition newMat color) newBs
+  in AppState res ec newBs
 
 instance StoreData AppState where
     type StoreAction AppState = Action
@@ -81,17 +68,17 @@ instance StoreData AppState where
     transform (CellClicked _) appState@(AppState _ True _) =
       return appState
       
-    transform (CellClicked color) appState@(AppState (Just (mat, cnt)) _ bs) =
+    transform (CellClicked color) appState@(AppState (Just (mat, cnt)) _ bs) = do
       case look mat center /= color of
-       True -> changeColors mat color cnt bs
+       True -> return $ changeColors mat color cnt bs
        False -> return appState
        
-    transform InitGame (AppState xs _ bs) =
-      let f mat = AppState (Just (mat, 0)) False (newBestScore xs bs)
-      in fmap f randomMatrix
+    transform InitGame (AppState xs _ bs) = do
+      mat <- randomMatrix
+      return $ AppState (Just (mat, 0)) False (newBestScore xs bs)
          
     transform _ _ = do
-      error "You should never come here!"
+      error "You should never be here!"
 
 store :: ReactStore AppState
 store = mkStore $ AppState Nothing False Nothing
@@ -122,7 +109,7 @@ renderRow_ idx vec = viewWithKey renderRow idx (idx, vec) mempty
 
 
 renderGame_ :: Matrix Color -> ReactElementM ViewEventHandler ()
-renderGame_ mat =
+renderGame_ mat = do
   table_ [ "className" $= "matrix" ]
   $ tbody_ []
   $ Vec.imapM_ renderRow_ mat
