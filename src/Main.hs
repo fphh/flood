@@ -137,13 +137,13 @@ renderCounter_ :: Int -> Bool -> Maybe Int -> ReactElementM ViewEventHandler ()
 renderCounter_ cnt go bs =
   p_ [ "className" $= "counter" ] $ do
     span_ [ "className" $= "line-start" ] $ "You needed "
-    b_ [] $ elemText (show cnt)
-    span_ [] $ elemText $ " move" ++ (if cnt == 1 then "" else "s") ++ " until now."
+    b_ [] $ elemShow cnt
+    span_ [] $ elemString $ " move" ++ (if cnt == 1 then "" else "s") ++ " until now."
     case bs of
      Just x -> do
        br_ []
        span_ [ "className" $= "line-start" ] $ " Your minimal score is "
-       b_ [] $ elemText (show x)
+       b_ [] $ elemShow x
        span_ [] "."
      Nothing -> return ()
     when go $ do
